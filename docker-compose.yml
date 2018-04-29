@@ -1,0 +1,51 @@
+version: '2'
+services:
+  test:
+    build: .
+    command: bash -c "npm install --silent && npm run test"
+    links:
+      - mongo
+    depends_on:
+      - mongo
+  deploy-dev:
+    build: .
+    command: bash -c "npm install --silent && npm run deploy:dev"
+    ports:
+      - "8080:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - ORIGINAL_IMAGE_BUCKET=${ORIGINAL_IMAGE_BUCKET}
+      - RESIZED_IMAGE_BUCKET=${RESIZED_IMAGE_BUCKET}
+      - MONGO_URI=${MONGO_URI}
+      - PATH=/image-serverless/node_modules/.bin:$PATH
+  deploy-staging:
+    build: .
+    command: bash -c "npm install --silent && npm run deploy:stg"
+    ports:
+      - "8080:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - ORIGINAL_IMAGE_BUCKET=${ORIGINAL_IMAGE_BUCKET}
+      - RESIZED_IMAGE_BUCKET=${RESIZED_IMAGE_BUCKET}
+      - MONGO_URI=${MONGO_URI}
+      - PATH=/image-serverless/node_modules/.bin:$PATH
+  deploy-production:
+      build: .
+      command: bash -c "npm install --silent && npm run deploy:prod"
+      ports:
+        - "8080:8080"
+      environment:
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+        - ORIGINAL_IMAGE_BUCKET=${ORIGINAL_IMAGE_BUCKET}
+        - RESIZED_IMAGE_BUCKET=${RESIZED_IMAGE_BUCKET}
+        - MONGO_URI=${MONGO_URI}
+        - PATH=/image-serverless/node_modules/.bin:$PATH
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    command: --smallfiles

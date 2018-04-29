@@ -1,0 +1,56 @@
+{
+  "name": "kipwise-image",
+  "version": "0.0.1",
+  "description": "Serverless service for resizing image",
+  "main": "handler.js",
+  "scripts": {
+    "test": "jest --config jestconfig.json --coverage --forceExit",
+    "dev": "sls offline start --port 8080 --webpack-use-polling",
+    "test:watch": "npm run test -- --watch",
+    "deploy:dev": "sls deploy",
+    "deploy:stg": "sls deploy --stage staging",
+    "deploy:prod": "sls deploy --stage production"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "0.0.22",
+    "@types/file-type": "^5.2.1",
+    "@types/jest": "^22.2.0",
+    "@types/mongoose": "^5.0.7",
+    "@types/node": "^8.0.57",
+    "@types/ramda": "github:types/npm-ramda#dist",
+    "@types/sharp": "^0.17.6",
+    "aws-sdk-mock": "^1.7.0",
+    "eslint-plugin-typescript": "^0.9.0",
+    "jest": "^22.4.2",
+    "lambda-tester": "^3.2.0",
+    "serverless-offline": "^3.18.0",
+    "serverless-webpack": "^4.0.0",
+    "ts-jest": "^22.4.1",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.7.2",
+    "typescript-eslint-parser": "^14.0.0",
+    "webpack": "^3.6.0"
+  },
+  "author": "KaFai Choi",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.205.0",
+    "bluebird": "^3.5.1",
+    "file-type": "^7.6.0",
+    "mongoose": "^5.0.9",
+    "mongoose-uuid2": "^2.1.0",
+    "node-base64-image": "^1.0.4",
+    "ramda": "^0.25.0",
+    "serverless": "^1.26.1",
+    "sha1": "^1.1.1",
+    "sharp": "^0.20.1",
+    "url-parse": "^1.2.0",
+    "uuid": "^3.2.1"
+  },
+  "standard": {
+    "parser": "typescript-eslint-parser",
+    "plugins": [
+      "typescript"
+    ]
+  }
+}

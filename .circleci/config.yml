@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ypereirareis/docker-compose
+
+    working_directory: ~/image-serverless
+    
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - dependencies-cache-{{ checksum "package.json" }}
+            - dependencies-cache
+      - run:
+          name: Running Test with code coverage
+          command: docker-compose run test
+      - run:
+          name: Deploy application 
+          command: docker-compose run deploy-production
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies-cache-{{ checksum "package.json" }}

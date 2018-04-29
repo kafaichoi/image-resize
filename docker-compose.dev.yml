@@ -1,0 +1,14 @@
+version: '2'
+services:
+  test:
+    volumes:
+      - ./:/image-serverless
+  deploy-dev:
+    volumes:
+      - ./:/image-serverless
+  deploy-staging:
+      volumes:
+        - ./:/image-serverless
+  deploy-production:
+      volumes:
+        - ./:/image-serverless

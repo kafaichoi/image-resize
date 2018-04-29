@@ -1,0 +1,99 @@
+service:
+  name: image-service
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  stage: ${opt:stage, "dev"}
+  region: ${opt:region, "us-east-1"}
+  processResizingTopic: "${self:service}-process-resizing-${self:custom.stage}"
+  buckets:
+    originalImageBucket: ${env:ORIGINAL_IMAGE_BUCKET}
+    resizedImageBucket: ${env:RESIZED_IMAGE_BUCKET}
+  serverless-offline:
+    host: 0.0.0.0
+  webpackIncludeModules: true # for packing external lib, sharp
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  apiKeys:
+    - "${self:service}-${self:custom.stage}-key"
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.buckets.originalImageBucket}
+            - "/*"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.buckets.resizedImageBucket}
+            - "/*"
+    - Effect: "Allow"
+      Action:
+        - "sns:Publish"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:sns:"
+            - ${self:custom.region}
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - ${self:custom.processResizingTopic}
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource: "*"
+  environment:
+    ORIGINAL_IMAGE_BUCKET: ${env:ORIGINAL_IMAGE_BUCKET}
+    RESIZED_IMAGE_BUCKET: ${env:RESIZED_IMAGE_BUCKET}
+    MONGO_URI: ${env:MONGO_URI}
+  variableSyntax: "\\${((?!AWS)[ ~:a-zA-Z0-9._'\",\\-\\/\\(\\)]+?)}"
+
+functions:
+  resizeImage:
+    handler: src/handler.resizeImage
+    environment:
+      snsArn: { "Fn::Join" : ["", ["arn:aws:sns:${self:custom.region}:", { "Ref" : "AWS::AccountId" }, ":${self:custom.processResizingTopic}" ] ]  }
+    events:
+      - http:
+          method: post
+          path: images
+          private: true
+  getResized:
+    handler: src/handler.getResized
+    events:
+      - http:
+          method: get
+          path: images
+          private: true
+  processResizing:
+    handler: src/handler.processResizing
+    events:
+      - sns: ${self:custom.processResizingTopic}
+  retryResizing:
+    handler: src/handler.retryResizing
+    events:
+      - schedule: rate(10 minutes)
+
+package:
+  exclude:
+    - .serverless
+    - .webpack
+    - coverage/**
+    - .circleci/**
+    - __tests__/**
