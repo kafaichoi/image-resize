@@ -1,6 +1,5 @@
-import * as R from 'ramda'
-
 const rejectString = '@@kipwise-image/out'
-export const mapOnlyResolved = (promises : Promise<any>[]) =>
+
+export const mapOnlyResolved = <T>(promises: Promise<T>[]): Promise<T[]> =>
   Promise.all(promises.map(p => p.catch(e => rejectString)))
-    .then(R.reject(R.equals(rejectString)))
+    .then(x => x.filter((val): val is T => val === rejectString))
