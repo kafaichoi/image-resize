@@ -7,7 +7,7 @@ plugins:
 
 custom:
   stage: ${opt:stage, "dev"}
-  region: ${opt:region, "us-east-1"}
+  region: ${env:AWS_REGION, "us-east-1"}
   processResizingTopic: "${self:service}-process-resizing-${self:custom.stage}"
   buckets:
     originalImageBucket: ${env:ORIGINAL_IMAGE_BUCKET}
