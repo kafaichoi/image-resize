@@ -73,7 +73,7 @@ functions:
       - http:
           method: post
           path: images
-          private: true
+          private: false
   getResized:
     handler: src/handler.getResized
     events:
